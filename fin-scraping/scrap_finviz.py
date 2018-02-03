@@ -53,8 +53,6 @@ def main():
     out_path = config['GLOBALS']['output_path']
     base_url = config['GLOBALS']['base_url']
 
-    #_AUTO_TAG_ = 'finviz_scraping'
-
     logging.config.fileConfig(config_log) 
     logger = logging.getLogger('finviz_scraping')
     #logger = logging.getLogger()
@@ -67,7 +65,6 @@ def main():
             line = line.rstrip()
             sym_list.append(line)
 
-    #print (sym_list)
     logger.info('symbol list: {}'.format(sym_list))
 
     for _SYM_ in sym_list:
