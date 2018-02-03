@@ -1,5 +1,9 @@
 *.py[cod]
 
+*.log
+*.ini
+*.swp
+
 # C extensions
 *.so
 

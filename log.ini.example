@@ -1,0 +1,34 @@
+[loggers]
+keys=root,finviz_scraping
+
+[handlers]
+keys=stream_handler,file_handler
+
+[formatters]
+keys=formatter
+
+[logger_root]
+level=INFO
+handlers=stream_handler
+
+[logger_finviz_scraping]
+level=DEBUG
+handlers=file_handler
+qualname=finviz_scraping
+
+[handler_stream_handler]
+class=StreamHandler
+level=DEBUG
+formatter=formatter
+args=(sys.stderr,)
+
+[handler_file_handler]
+class=FileHandler
+level=DEBUG
+formatter=formatter
+args=('scrap_finviz.log',)
+
+[formatter_formatter]
+#format=%(asctime)s %(name)-12s %(levelname)-8s %(message)s
+format=%(asctime)s [%(name)-12s] [%(levelname)-5.5s]  %(message)s
+datefmt=%Y-%m-%d %H:%M:%S
