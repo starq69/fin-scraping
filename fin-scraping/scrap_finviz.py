@@ -28,7 +28,13 @@ def main():
     #fincore.FinCoremodel.startup()
 
     core = FinCoremodel()
-    log = core.startup()
+
+    if not core.startup():
+        exit()
+
+    log=core.getLog()
+
+    #log = core.startup()
     logging.config.fileConfig(log)
     logger = logging.getLogger(__name__)
 

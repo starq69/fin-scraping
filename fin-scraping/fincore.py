@@ -13,6 +13,9 @@ class FinCoremodel(object):
     u_a = ''
     base_url = ''
     out_path = ''
+    #logger = None
+    config_log = ''
+    config_file = ''
 
     #@staticmethod
     def startup(self):
@@ -31,11 +34,11 @@ class FinCoremodel(object):
 
         parent_dir = os.path.split(base_dir)[0]
 
-        config_file = parent_dir + '/config.ini'
-        config_log  = parent_dir + '/log.ini'
+        self.config_file = parent_dir + '/config.ini'
+        self.config_log  = parent_dir + '/log.ini'
 
         config = configparser.ConfigParser()
-        config.read(config_file)
+        config.read(self.config_file)
 
         if isLocked(config):
             sys.exit()
@@ -45,10 +48,14 @@ class FinCoremodel(object):
         self.out_path = config['GLOBALS']['output_path']
         self.base_url = config['GLOBALS']['base_url']
 
-        logging.config.fileConfig(config_log)
+        logging.config.fileConfig(self.config_log)
         #logger = logging.getLogger('finviz_scraping')
         logger = logging.getLogger(__name__)
 
-        logger.info("START: config file is <{}>".format(config_file))
+        logger.info("START: config file is <{}>".format(self.config_file))
 
-        return config_log
+        #return config_log
+        return True
+
+    def getLog(self):
+        return self.config_log
