@@ -13,9 +13,10 @@ class FinCoremodel(object):
     u_a = ''
     base_url = ''
     out_path = ''
-    #logger = None
+    logger = None
     config_log = ''
     config_file = ''
+
 
     #@staticmethod
     def startup(self):
@@ -50,12 +51,21 @@ class FinCoremodel(object):
 
         logging.config.fileConfig(self.config_log)
         #logger = logging.getLogger('finviz_scraping')
-        logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(__name__)
 
-        logger.info("START: config file is <{}>".format(self.config_file))
+        self.logger.info("START: config file is <{}>".format(self.config_file))
 
         #return config_log
         return True
 
     def getLog(self):
         return self.config_log
+
+    def getSymbolList(self):
+        sym_list = []
+        with open(self.sym_file, 'r') as f:
+            for line in f:
+                line = line.rstrip()
+                sym_list.append(line)
+                #self.logger.debug(sym_list)
+        return sym_list

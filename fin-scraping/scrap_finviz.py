@@ -40,13 +40,22 @@ def main():
 
     today = time.strftime("%Y%m%d")
 
-    sym_list = []
+    #sym_list = []
 
-    with open(core.sym_file, 'r') as f:
-        for line in f:
-            line = line.rstrip()
-            sym_list.append(line)
+    '''
+    https://stackoverflow.com/questions/1971240/python-seek-on-remote-file-using-http
 
+    considerare la possibilità di un sym_file remoto
+    url = "http://www.website.com/data/simbol_list.txt"
+
+    r = requests.get(url)
+
+    # If a 4XX client error or a 5XX server error is encountered, we raise it.
+    r.raise_for_status()
+
+    '''
+    sym_list = core.getSymbolList()
+    
     logger.info('symbol list: {}'.format(sym_list))
 
     for _SYM_ in sym_list:
