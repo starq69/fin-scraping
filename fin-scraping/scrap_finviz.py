@@ -8,13 +8,14 @@
 import sys, os
 import time
 import re
-import configparser 
+import configparser
 import logging.config
 import urllib.request
 from html import unescape as unescape     # iPython 3.4+ ==> html.unescape(s)
 from urllib.error import URLError, HTTPError
 from bs4 import BeautifulSoup
 
+import fincore
 
 def get_fundametal_data(keys, values, index, default=None):
     try:
@@ -22,17 +23,13 @@ def get_fundametal_data(keys, values, index, default=None):
     except IndexError:
         return default
 
-def isLocked(config):
-    if config['GLOBALS']['locked']=='Yes':
-        return True
-
 def main():
-
+    '''
     _FF_ = 'FUNDAMENTALS'   # fondamentali
     _RT_ = 'RATINGS'        # ratings
     _NEWS_ = 'NEWS'         # news
 
-    base_dir= os.path.dirname(os.path.realpath(__file__)) 
+    base_dir= os.path.dirname(os.path.realpath(__file__))
 
     parent_dir = os.path.split(base_dir)[0]
 
@@ -53,10 +50,13 @@ def main():
     out_path = config['GLOBALS']['output_path']
     base_url = config['GLOBALS']['base_url']
 
-    logging.config.fileConfig(config_log) 
+    logging.config.fileConfig(config_log)
     logger = logging.getLogger('finviz_scraping')
     #logger = logging.getLogger()
     logger.info("START: config file is <{}>".format(config_file))
+    '''
+
+    fincore.startup()
 
     sym_list = []
 
@@ -77,7 +77,7 @@ def main():
 
         # http://stackoverflow.com/questions/12023135/python-3-errorhandling-urllib-requests
         # https://docs.python.org/3.1/howto/urllib2.html
-        try:    
+        try:
             with urllib.request.urlopen (req) as response:
                 html = response.read()
 
