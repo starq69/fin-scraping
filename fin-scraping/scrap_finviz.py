@@ -8,14 +8,14 @@
 import sys, os
 import time
 import re
-import configparser
+#import configparser
 import logging.config
 import urllib.request
 from html import unescape as unescape     # iPython 3.4+ ==> html.unescape(s)
 from urllib.error import URLError, HTTPError
 from bs4 import BeautifulSoup
 
-import fincore
+from fincore import FinCoremodel
 
 def get_fundametal_data(keys, values, index, default=None):
     try:
@@ -24,43 +24,19 @@ def get_fundametal_data(keys, values, index, default=None):
         return default
 
 def main():
-    '''
-    _FF_ = 'FUNDAMENTALS'   # fondamentali
-    _RT_ = 'RATINGS'        # ratings
-    _NEWS_ = 'NEWS'         # news
 
-    base_dir= os.path.dirname(os.path.realpath(__file__))
+    #fincore.FinCoremodel.startup()
 
-    parent_dir = os.path.split(base_dir)[0]
-
-    config_file = parent_dir + '/config.ini'
-    config_log  = parent_dir + '/log.ini'
-
-    config = configparser.ConfigParser()
-    config.read(config_file)
-
-    if isLocked(config):
-        print("GLOBALS.locked=Yes : il programma non verrà eseguito.")
-        sys.exit()
+    core = FinCoremodel()
+    log = core.startup()
+    logging.config.fileConfig(log)
+    logger = logging.getLogger(__name__)
 
     today = time.strftime("%Y%m%d")
 
-    u_a      = config['GLOBALS']['user_agent']
-    sym_file = config['GLOBALS']['symbol_file']
-    out_path = config['GLOBALS']['output_path']
-    base_url = config['GLOBALS']['base_url']
-
-    logging.config.fileConfig(config_log)
-    logger = logging.getLogger('finviz_scraping')
-    #logger = logging.getLogger()
-    logger.info("START: config file is <{}>".format(config_file))
-    '''
-
-    fincore.startup()
-
     sym_list = []
 
-    with open(sym_file, 'r') as f:
+    with open(core.sym_file, 'r') as f:
         for line in f:
             line = line.rstrip()
             sym_list.append(line)
@@ -70,10 +46,10 @@ def main():
     for _SYM_ in sym_list:
 
         #url = "http://finviz.com/quote.ashx?t=" + _SYM_
-        url = base_url + _SYM_
+        url = core.base_url + _SYM_
 
         req = urllib.request.Request (url)
-        req.add_header ('User-Agent', u_a)
+        req.add_header ('User-Agent', core.u_a)
 
         # http://stackoverflow.com/questions/12023135/python-3-errorhandling-urllib-requests
         # https://docs.python.org/3.1/howto/urllib2.html
@@ -94,7 +70,7 @@ def main():
 
         # FONDAMENTALI
 
-        fout = open(out_path + "finviz-" + _SYM_ + "-" + _FF_ + "-" + today + ".txt", "w")
+        fout = open(core.out_path + "finviz-" + _SYM_ + "-" + core._FF_ + "-" + today + ".txt", "w")
 
         table = bsObj.find("", {"class":"snapshot-table2"})
 
@@ -110,7 +86,7 @@ def main():
 
         # RATINGS
 
-        fout = open(out_path + "finviz-" + _SYM_ + "-" + _RT_ + "-" + today + ".txt", "w")
+        fout = open(core.out_path + "finviz-" + _SYM_ + "-" + core._RT_ + "-" + today + ".txt", "w")
 
         ratings = bsObj.findAll("", {"class":re.compile("fullview-ratings-*")})
         for item in ratings:
@@ -120,8 +96,8 @@ def main():
 
         # NEWS
 
-        fout = open(out_path + "finviz-" + _SYM_ + "-" + _NEWS_ + "-" + today + ".txt", "w")
-        furl = open(out_path + "finviz-" + _SYM_ + "-URL-" + _NEWS_ + ".txt", "w")
+        fout = open(core.out_path + "finviz-" + _SYM_ + "-" + core._NEWS_ + "-" + today + ".txt", "w")
+        furl = open(core.out_path + "finviz-" + _SYM_ + "-URL-" + core._NEWS_ + ".txt", "w")
 
         for row in bsObj.find("table",{"id":"news-table"}).children:
             #fout.write(str(row))
