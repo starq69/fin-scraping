@@ -2,6 +2,8 @@ import sys, os
 import configparser
 import logging.config
 
+class FinCoremodelException(Exception):
+    pass
 
 class FinCoremodel(object):
 
@@ -17,8 +19,14 @@ class FinCoremodel(object):
     config_log = ''
     config_file = ''
 
+    stuff = {}
 
-    #@staticmethod
+    start = False
+
+    # TODO
+    # trasformare in __init__
+    # gestione eccezioni : https://stackoverflow.com/questions/20059766/handle-exception-in-init
+
     def startup(self):
 
         def isLocked(config):
@@ -56,9 +64,13 @@ class FinCoremodel(object):
         self.logger.info("START: config file is <{}>".format(self.config_file))
 
         #return config_log
-        return True
+        self.start = True
+        return self.start
 
     def getLog(self):
+        if not self.start:
+            print (__name__ + ' not initialized : call startup()')
+            sys.exit()
         return self.config_log
 
     def getSymbolList(self):
@@ -69,3 +81,7 @@ class FinCoremodel(object):
                 sym_list.append(line)
                 #self.logger.debug(sym_list)
         return sym_list
+
+    def getStuff(self):
+        self.stuff['xxx']='xxx'
+        return self.stuff['xxx']

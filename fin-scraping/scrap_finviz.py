@@ -44,18 +44,17 @@ def main():
 
     '''
     https://stackoverflow.com/questions/1971240/python-seek-on-remote-file-using-http
-
     considerare la possibilità di un sym_file remoto
     url = "http://www.website.com/data/simbol_list.txt"
-
     r = requests.get(url)
-
     # If a 4XX client error or a 5XX server error is encountered, we raise it.
     r.raise_for_status()
-
     '''
     sym_list = core.getSymbolList()
-    
+
+    #stuff = core.getStuff()
+    #logger.info('stuff: {}'.format(stuff))
+
     logger.info('symbol list: {}'.format(sym_list))
 
     for _SYM_ in sym_list:
@@ -126,6 +125,8 @@ def main():
 
         fout.close()
         furl.close()
+
+
 
         logger.info(_SYM_ + '...done')
 
