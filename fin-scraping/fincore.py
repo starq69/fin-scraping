@@ -1,8 +1,15 @@
 import sys, os
 import configparser
-import logging.config
+import logging, logging.config
 
 class FinCoremodelException(Exception):
+    '''
+    original_exception = None
+
+    def __init__(self, msg, original_exception):
+        super(FinCoremodelException, self).__init__(msg + (": %s" % original_exception))
+        self.original_exception = original_exception
+    '''
     pass
 
 class FinCoremodel(object):
@@ -11,33 +18,7 @@ class FinCoremodel(object):
     _RT_ = 'RATINGS'        # ratings
     _NEWS_ = 'NEWS'         # news
 
-    sym_file = ''
-    u_a = ''
-    base_url = ''
-    out_path = ''
-    logger = None
-    config_log = ''
-    config_file = ''
-
-    stuff = {}
-
-    start = False
-
-    # TODO
-    # trasformare in __init__
-    # gestione eccezioni : https://stackoverflow.com/questions/20059766/handle-exception-in-init
-
-    def startup(self):
-
-        def isLocked(config):
-            if config['GLOBALS']['locked']=='Yes':
-                # in genere se il flag è =yes ci potremmo attendere di trovare un record
-                # per es. sul file 'maintenancelog.txt' con una breve descrizione del motivo...
-                #
-                print("GLOBALS.locked=Yes : il programma non può essere avviato.")
-                #
-                # ...e quindi stampare a video il contenuto di questo record
-                return True
+    def __init__(self):
 
         base_dir= os.path.dirname(os.path.realpath(__file__))
 
@@ -46,32 +27,33 @@ class FinCoremodel(object):
         self.config_file = parent_dir + '/config.ini'
         self.config_log  = parent_dir + '/log.ini'
 
-        config = configparser.ConfigParser()
-        config.read(self.config_file)
+        self.config = configparser.ConfigParser()
 
-        if isLocked(config):
-            sys.exit()
 
-        self.u_a      = config['GLOBALS']['user_agent']
-        self.sym_file = config['GLOBALS']['symbol_file']
-        self.out_path = config['GLOBALS']['output_path']
-        self.base_url = config['GLOBALS']['base_url']
+    def __enter__(self):
 
-        logging.config.fileConfig(self.config_log)
-        #logger = logging.getLogger('finviz_scraping')
-        self.logger = logging.getLogger(__name__)
+        if not self.config.read(self.config_file):
 
-        self.logger.info("START: config file is <{}>".format(self.config_file))
+            raise FinCoremodelException('missing <' + self.config_file + '> configuration file.')
 
-        #return config_log
-        self.start = True
-        return self.start
+        elif self.config['GLOBALS']['locked'] == 'Yes':
 
-    def getLog(self):
-        if not self.start:
-            print (__name__ + ' not initialized : call startup()')
-            sys.exit()
-        return self.config_log
+            raise FinCoremodelException("GLOBALS.locked=Yes : il programma non può essere avviato.")
+        else:
+            logging.config.fileConfig(self.config_log)
+            self.logger = logging.getLogger(__name__)
+            self.logger.info('START: config file is <{}>'.format(self.config_file))
+
+            self.u_a = self.config['GLOBALS']['user_agent']
+            self.sym_file = self.config['GLOBALS']['symbol_file']
+            self.out_path = self.config['GLOBALS']['output_path']
+            self.base_url = self.config['GLOBALS']['base_url']
+
+            return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+
+        print("__exit__")
 
     def getSymbolList(self):
         sym_list = []
@@ -82,6 +64,3 @@ class FinCoremodel(object):
                 #self.logger.debug(sym_list)
         return sym_list
 
-    def getStuff(self):
-        self.stuff['xxx']='xxx'
-        return self.stuff['xxx']
