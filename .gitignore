@@ -1,5 +1,9 @@
 *.py[cod]
 
+*.log
+*.ini
+*.swp
+
 # C extensions
 *.so
 
@@ -34,3 +38,6 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+.idea
+*.py.nogit
