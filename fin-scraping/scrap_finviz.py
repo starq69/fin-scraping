@@ -15,13 +15,14 @@ def get_fundametal_data(keys, values, index, default=None):
     except IndexError:
         return default
 
+
 def main():
 
     try:
+
         with FinCoremodel() as core:
 
             logger = logging.getLogger(__name__)
-
             today = time.strftime("%Y%m%d")
 
             sym_list = core.getSymbolList()
@@ -100,6 +101,7 @@ def main():
                 logger.info(_SYM_ + '...done')
 
     except FinCoremodelException as e:
+        #logger.error(e)
         print("EXEPTION: {}".format(e))
         sys.exit()
 

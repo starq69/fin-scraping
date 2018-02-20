@@ -3,14 +3,14 @@ import configparser
 import logging, logging.config
 
 class FinCoremodelException(Exception):
-    '''
+
     original_exception = None
 
     def __init__(self, msg, original_exception):
         super(FinCoremodelException, self).__init__(msg + (": %s" % original_exception))
         self.original_exception = original_exception
-    '''
-    pass
+
+    #pass
 
 class FinCoremodel(object):
 
@@ -32,28 +32,40 @@ class FinCoremodel(object):
 
     def __enter__(self):
 
-        if not self.config.read(self.config_file):
+        try:
+            if not self.config.read(self.config_file):
 
-            raise FinCoremodelException('missing <' + self.config_file + '> configuration file.')
+                raise FinCoremodelException('missing <' + self.config_file + '> configuration file.')
 
-        elif self.config['GLOBALS']['locked'] == 'Yes':
+            elif self.config['GLOBALS']['locked'] == 'Yes':
 
-            raise FinCoremodelException("GLOBALS.locked=Yes : il programma non può essere avviato.")
-        else:
-            logging.config.fileConfig(self.config_log)
-            self.logger = logging.getLogger(__name__)
-            self.logger.info('START: config file is <{}>'.format(self.config_file))
+                raise FinCoremodelException(__name__ + ' is locked. To run it unset GLOBALS.locked')
+            else:
+                logging.config.fileConfig(self.config_log)
+                self.logger = logging.getLogger(__name__)
+                self.logger.info('START: config file is <{}>'.format(self.config_file))
 
-            self.u_a = self.config['GLOBALS']['user_agent']
-            self.sym_file = self.config['GLOBALS']['symbol_file']
-            self.out_path = self.config['GLOBALS']['output_path']
-            self.base_url = self.config['GLOBALS']['base_url']
+                self.u_a = self.config['GLOBALS']['user_agent']
+                self.sym_file = self.config['GLOBALS']['symbol_file']
+                self.out_path = self.config['GLOBALS']['output_path']
+                self.base_url = self.config['GLOBALS']['base_url']
 
-            return self
+                return self
+
+        except:
+            '''
+            if self.__exit__(*sys.exc_info()):
+                self.enter_ok = False
+            else:
+                raise
+            '''
+            self.__exit__(*sys.exc_info())
+            raise
+
 
     def __exit__(self, exc_type, exc_val, exc_tb):
 
-        print("__exit__")
+        pass
 
     def getSymbolList(self):
         sym_list = []
