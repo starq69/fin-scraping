@@ -22,10 +22,9 @@ def main():
 
         with FinCoremodel() as core:
 
-            logger = logging.getLogger(__name__)
-            today = time.strftime("%Y%m%d")
-
-            sym_list = core.getSymbolList()
+            logger      = logging.getLogger(__name__)
+            today       = time.strftime("%Y%m%d")
+            sym_list    = core.getSymbolList()
 
             logger.info('symbol list: {}'.format(sym_list))
 
