@@ -14,20 +14,18 @@ class FinCoremodelException(Exception):
 
 class FinCoremodel(object):
 
-    _FF_ = 'FUNDAMENTALS'   # fondamentali
-    _RT_ = 'RATINGS'        # ratings
-    _NEWS_ = 'NEWS'         # news
+    _FF_    = 'FUNDAMENTALS'   # fondamentali
+    _RT_    = 'RATINGS'        # ratings
+    _NEWS_  = 'NEWS'         # news
 
     def __init__(self):
 
-        base_dir= os.path.dirname(os.path.realpath(__file__))
-
-        parent_dir = os.path.split(base_dir)[0]
+        base_dir    = os.path.dirname(os.path.realpath(__file__))
+        parent_dir  = os.path.split(base_dir)[0]
 
         self.config_file = parent_dir + '/config.ini'
         self.config_log  = parent_dir + '/log.ini'
-
-        self.config = configparser.ConfigParser()
+        self.config      = configparser.ConfigParser()
 
 
     def __enter__(self):
@@ -45,7 +43,7 @@ class FinCoremodel(object):
                 self.logger = logging.getLogger(__name__)
                 self.logger.info('START: config file is <{}>'.format(self.config_file))
 
-                self.u_a = self.config['GLOBALS']['user_agent']
+                self.u_a      = self.config['GLOBALS']['user_agent']
                 self.sym_file = self.config['GLOBALS']['symbol_file']
                 self.out_path = self.config['GLOBALS']['output_path']
                 self.base_url = self.config['GLOBALS']['base_url']
