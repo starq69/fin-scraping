@@ -41,12 +41,16 @@ class FinCoremodel(object):
             else:
                 logging.config.fileConfig(self.config_log)
                 self.logger = logging.getLogger(__name__)
-                self.logger.info('START: config file is <{}>'.format(self.config_file))
 
                 self.u_a      = self.config['GLOBALS']['user_agent']
                 self.sym_file = self.config['GLOBALS']['symbol_file']
                 self.out_path = self.config['GLOBALS']['output_path']
                 self.base_url = self.config['GLOBALS']['base_url']
+                self.scan_url_news = self.config['GLOBALS']['scan_url_news']
+
+                self.logger.info('START: config file is <{}>'.format(self.config_file))
+                if self.scan_url_news:
+                    self.logger.info('scan_url_news flag is FALSE') ##!!
 
                 return self
 

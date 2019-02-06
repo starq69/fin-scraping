@@ -28,9 +28,10 @@ def main():
 
             logger.info('symbol list: {}'.format(sym_list))
 
+            #finviz_reader = finviz_generator(core, sym_list)
+
             for _SYM_ in sym_list:
 
-                #url = "http://finviz.com/quote.ashx?t=" + _SYM_
                 url = core.base_url + _SYM_
 
                 req = urllib.request.Request (url)
@@ -69,6 +70,8 @@ def main():
                     x += 1
                     data = get_fundametal_data(keys, values, x)
 
+                fout.close()
+
                 # RATINGS
 
                 fout = open(core.out_path + "finviz-" + _SYM_ + "-" + core._RT_ + "-" + today + ".txt", "w")
@@ -97,11 +100,16 @@ def main():
                 fout.close()
                 furl.close()
 
-                logger.info(_SYM_ + '...done')
+                logger.info(_SYM_ + '...finviz scaping is done')
+
+                if core.scan_url_news:
+                    logger.info('TBD : scan_url_news')
+
+                #logger.info(_SYM_ + '...done')
 
     except FinCoremodelException as e:
         #logger.error(e)
-        print("EXEPTION: {}".format(e))
+        print("FinCoremodel EXEPTION: {}".format(e))
         sys.exit()
 
 if __name__ == "__main__":
