@@ -1,8 +1,7 @@
 import sys, os
 import configparser
 import logging, logging.config
-
-#from loader import load_adapter
+from importFromURI import importModule 
 
 #_documents = {}
 
@@ -31,6 +30,8 @@ class FinCoremodel(object):
         self.config_log  = parent_dir + '/log.ini'
         self.config      = configparser.ConfigParser()
 
+        self._scrapers   = dict()
+
 
     def __enter__(self):
 
@@ -44,7 +45,7 @@ class FinCoremodel(object):
                 raise FinCoremodelException(__name__ + ' is locked. To run it unset GLOBALS.locked')
             else:
                 logging.config.fileConfig(self.config_log)
-                self.logger = logging.getLogger(__name__)
+                self.log = logging.getLogger(__name__)
 
                 self.u_a      = self.config['GLOBALS']['user_agent']
                 self.sym_file = self.config['GLOBALS']['symbol_file']
@@ -52,11 +53,15 @@ class FinCoremodel(object):
                 self.base_url = self.config['GLOBALS']['base_url']
                 self.scan_url_news = self.config['GLOBALS']['scan_url_news']
 
-                self.logger.info('START: config file is <{}>'.format(self.config_file))
+                self.log.info('START: config file is <{}>'.format(self.config_file))
                 if self.scan_url_news:
-                    self.logger.info('scan_url_news flag is FALSE') ##!!
+                    self.log.info('scan_url_news flag is FALSE') ##!!
 
                 return self
+
+        except configparser.Error as e:
+            self.log.error ('configparser.Error : {} --> ABORT'.format (e))
+            sys.exit(1)
 
         except:
             '''
@@ -73,8 +78,6 @@ class FinCoremodel(object):
 
         pass
 
-    #def web_scrap(self, module):
-
 
     def getSymbolList(self):
         sym_list = []
@@ -82,6 +85,25 @@ class FinCoremodel(object):
             for line in f:
                 line = line.rstrip()
                 sym_list.append(line)
-                #self.logger.debug(sym_list)
+                #self.log.debug(sym_list)
         return sym_list
 
+
+    def add_web_scraper(self, ws_name):
+        module = ws_name.strip()
+        self.log.debug('try to import module <{}>'.format(module))
+        if module not in self._scrapers:
+            try:
+                self._scrapers[module] = importModule(module)  
+                self.log.info('==> model <{}> loaded'.format(module))
+                return self._scrapers[module]
+
+            except Exception as e:
+                self.log.error('fail to load model {} : ABORT'.format(module, e))
+                raise e
+                #sys.exit(1)
+        else:
+                self.log.info('==> model <{}> already loaded'.format(module))
+                return self._scrapers[module]
+
+        
