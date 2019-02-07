@@ -2,6 +2,10 @@ import sys, os
 import configparser
 import logging, logging.config
 
+#from loader import load_adapter
+
+#_documents = {}
+
 class FinCoremodelException(Exception):
 
     original_exception = None
@@ -68,6 +72,9 @@ class FinCoremodel(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
 
         pass
+
+    #def web_scrap(self, module):
+
 
     def getSymbolList(self):
         sym_list = []
