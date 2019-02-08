@@ -1,7 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import sys, os
 import configparser
 import logging, logging.config
-from importFromURI import importModule 
+from utils import supply_instance
 
 #_documents = {}
 
@@ -9,11 +12,10 @@ class FinCoremodelException(Exception):
 
     original_exception = None
 
-    def __init__(self, msg, original_exception):
+    def __init__(self, msg, original_exception=None):
         super(FinCoremodelException, self).__init__(msg + (": %s" % original_exception))
         self.original_exception = original_exception
 
-    #pass
 
 class FinCoremodel(object):
 
@@ -30,7 +32,7 @@ class FinCoremodel(object):
         self.config_log  = parent_dir + '/log.ini'
         self.config      = configparser.ConfigParser()
 
-        self._scrapers   = dict()
+        self._scrapers   = dict() ### scraper instances
 
 
     def __enter__(self):
@@ -63,19 +65,18 @@ class FinCoremodel(object):
             self.log.error ('configparser.Error : {} --> ABORT'.format (e))
             sys.exit(1)
 
-        except:
+        except Exception as e:
             '''
             if self.__exit__(*sys.exc_info()):
                 self.enter_ok = False
             else:
                 raise
             '''
-            self.__exit__(*sys.exc_info())
-            raise
+            self.__exit__(*sys.exc_info()) ##TODO
+            raise e
 
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-
         pass
 
 
@@ -106,4 +107,20 @@ class FinCoremodel(object):
                 self.log.info('==> model <{}> already loaded'.format(module))
                 return self._scrapers[module]
 
-        
+
+    def supply_web_scraper(self, ws_name, **kwargs):
+
+        _instance = ws_name.strip()
+        if _instance not in self._scrapers:
+            try:
+                self._scrapers[_instance] = supply_instance(_instance, **kwargs)  
+                self.log.info('web-scraper <{}> instance succesfully created'.format(_instance))
+                return self._scrapers[_instance]
+
+            except Exception as e:
+                #self.log.error('FAIL to create web-scraper <{}> instance: ABORT'.format(_instance))
+                raise FinCoremodelException('FAIL to create web-scraper <{}> instance: ABORT'.format(_instance), e)
+                #sys.exit(1)
+        else:
+                self.log.info('web-scraper <{}> instance already created '.format(_instance))
+                return self._scrapers[_instance]
