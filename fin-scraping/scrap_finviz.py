@@ -18,8 +18,10 @@ def main():
 
             logger      = logging.getLogger(__name__)
             today       = time.strftime("%Y%m%d")
-            sym_list    = core.getSymbolList()
 
+            # NB: ottenere prima finviz via core.supply_web_scraper() e poi finviz.getSymbolList() ora erronemanete in core (FinCoremodel)
+
+            sym_list    = core.getSymbolList()
             logger.info('symbol list: {}'.format(sym_list))
 
             finviz          = core.supply_web_scraper('finviz', kw_arg='starq')
@@ -29,10 +31,11 @@ def main():
 
                 _SYM_, bsObj = _document
 
+                '''starq@2021:debug
                 finviz.load_fundamentals(_document, today)  # fondamentali
                 finviz.load_ratings(_document, today)       # ratings
                 finviz.load_news(_document, today)          # news
-
+                '''
                 logger.info('scaping symbol <{}> done'.format(_SYM_))
 
                 if core.scan_url_news:

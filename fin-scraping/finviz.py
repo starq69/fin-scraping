@@ -3,7 +3,7 @@
 
 import os, re
 import logging
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup 
 import urllib.request
 from html import unescape as unescape     # iPython 3.4+ ==> html.unescape(s)
 from urllib.error import URLError, HTTPError
@@ -14,7 +14,7 @@ class Finviz(WebScraper):
 
     def __init__(self, **kwargs):
 
-        super(Finviz, self).__init__(**kwargs) 
+        super().__init__(**kwargs) 
 
 
     def scraping(self, sym_list, u_a):
@@ -44,8 +44,7 @@ class Finviz(WebScraper):
                 self.log.error('failed to reach server: {}'.format(e.reason), exc_info=True)
                 break
 
-            self.log.info('generator finviz.scraping() ready!')
-            yield _SYM_, BeautifulSoup(html, "lxml")
+            yield self.delivering(key=_SYM_, doc=BeautifulSoup(html, "lxml"))
 
 
     def load_fundamentals(self, document, today):
@@ -62,6 +61,7 @@ class Finviz(WebScraper):
 
         fout   = open(self.out_path + "finviz-" + _SYM_ + "-" + _FF_ + "-" + today + ".txt", "w")
         table  = bsObj.find("", {"class":"snapshot-table2"})
+        # starq@2021: table is None!
         keys   = table.findAll(class_="snapshot-td2-cp")
         values = table.findAll(class_="snapshot-td2")
 

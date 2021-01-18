@@ -13,7 +13,7 @@ class FinCoremodelException(Exception):
     original_exception = None
 
     def __init__(self, msg, original_exception=None):
-        super(FinCoremodelException, self).__init__(msg + (": %s" % original_exception))
+        super().__init__(msg + (": %s" % original_exception))
         self.original_exception = original_exception
 
 
@@ -37,6 +37,8 @@ class FinCoremodel(object):
 
     def __enter__(self):
 
+        ## TODO config/logging/self.variables sono inizializzazioni quindi vanno su __init__()
+
         try:
             if not self.config.read(self.config_file):
 
@@ -49,7 +51,13 @@ class FinCoremodel(object):
                 logging.config.fileConfig(self.config_log)
                 self.log = logging.getLogger(__name__)
 
-                self.u_a      = self.config['GLOBALS']['user_agent']
+                ##TODO
+                '''rimuovere u_a dalla config. ed utilizzare ad es. random.choice(ua__list) con user_agent.generate_user_agent() 
+                vedere :
+                https://www.scrapehero.com/how-to-rotate-proxies-and-ip-addresses-using-python-3/
+                '''
+
+                self.u_a      = self.config['GLOBALS']['user_agent'] 
                 self.sym_file = self.config['GLOBALS']['symbol_file']
                 self.out_path = self.config['GLOBALS']['output_path']
                 self.base_url = self.config['GLOBALS']['base_url']
@@ -89,7 +97,7 @@ class FinCoremodel(object):
                 #self.log.debug(sym_list)
         return sym_list
 
-
+    '''
     def add_web_scraper(self, ws_name):
         module = ws_name.strip()
         self.log.debug('try to import module <{}>'.format(module))
@@ -106,7 +114,7 @@ class FinCoremodel(object):
         else:
                 self.log.info('==> model <{}> already loaded'.format(module))
                 return self._scrapers[module]
-
+    '''
 
     def supply_web_scraper(self, ws_name, **kwargs):
 
