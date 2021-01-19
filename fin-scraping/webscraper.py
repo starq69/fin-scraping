@@ -12,7 +12,7 @@ class WebScraper(object):
 
     def __init__(self, **kwargs):
 
-        self.config_file=kwargs['config_file']
+        self.config_file=kwargs['config_file'] #TODO check if is a valid file
         self.config = configparser.ConfigParser()
         self.log    = logging.getLogger(__name__)
         self.log.info(kwargs) ##
@@ -23,10 +23,8 @@ class WebScraper(object):
             else:
                 ## TODO gestire user_agents come indicato su fincore.py 
                 self.u_a      = self.config['GLOBALS']['user_agent']
-                
                 self.out_path = self.config['GLOBALS']['output_path']
                 self.base_url = self.config['GLOBALS']['base_url']
-                self.log.info("out_path: <"+self.out_path+">")
 
         except configparser.Error as e:
             self.log.error ('configparser.Error : {} '.format(repr(e)))

@@ -19,7 +19,8 @@ def supply_instance(name, **kwargs):
         _class = getattr(module, _class)
         return _class(**kwargs)
 
-    except Exception as e:
+    #except Exception as e:
+    except (ModuleNotFoundError, AttributeError) as e:
         log.error(repr(e)) 
         log.exception(e)
         raise e 

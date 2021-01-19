@@ -16,19 +16,17 @@ def main():
 
     try:
         # TODO passare un TAG ? (gestire sulla Fincormodel.__init__(...)
-        with FinCoremodel() as core:
+        with FinCoremodel(web_scraper='finviz') as core:
 
             logger      = logging.getLogger(__name__)
             today       = time.strftime("%Y%m%d")
 
-            # NB: ottenere prima finviz via core.supply_web_scraper() e poi finviz.getSymbolList() ora erronemanete in core (FinCoremodel)
+            finviz          = core.get_web_scraper('finviz')
+            sym_list        = core.getSymbolList() #TODO implementare sulla class finviz ?
+            finviz_pages    = finviz.scraping(sym_list) 
 
-            # TODO dopo finviz=core... come metodo di finviz e non di core?
-            sym_list    = core.getSymbolList()
             logger.info('symbol list: {}'.format(sym_list))
 
-            finviz          = core.supply_web_scraper('finviz', config_file=core.config_file)
-            finviz_pages    = finviz.scraping(sym_list) 
 
             for _document in finviz_pages:
 
