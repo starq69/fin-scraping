@@ -3,6 +3,7 @@
 
 import os, re
 import logging
+#import logging.config
 from bs4 import BeautifulSoup 
 import urllib.request
 from html import unescape as unescape     # iPython 3.4+ ==> html.unescape(s)
@@ -15,9 +16,11 @@ class Finviz(WebScraper):
     def __init__(self, **kwargs):
 
         super().__init__(**kwargs) 
+        self.log = logging.getLogger(__name__)
+        self.log.info("Finviz.__init__()")
 
 
-    def scraping(self, sym_list, u_a):
+    def scraping(self, sym_list): 
         '''TODO
         (self, sym_list=None, ...
         n.b. se sym_list == None usa core.getSymbolList()
@@ -27,7 +30,7 @@ class Finviz(WebScraper):
             url = self.base_url + _SYM_ 
 
             req = urllib.request.Request (url)
-            req.add_header ('User-Agent', u_a)
+            req.add_header ('User-Agent', self.u_a)
 
             # http://stackoverflow.com/questions/12023135/python-3-errorhandling-urllib-requests
             # https://docs.python.org/3.1/howto/urllib2.html
@@ -59,31 +62,37 @@ class Finviz(WebScraper):
         _SYM_, bsObj = document
         _FF_ = 'FUNDAMENTALS' ##TODO
 
-        fout   = open(self.out_path + "finviz-" + _SYM_ + "-" + _FF_ + "-" + today + ".txt", "w")
         table  = bsObj.find("", {"class":"snapshot-table2"})
         # starq@2021: table is None!
-        keys   = table.findAll(class_="snapshot-td2-cp")
-        values = table.findAll(class_="snapshot-td2")
-
-        x = 0 
-        data = get_fundametal_data(keys, values, x)
-        while data:
-            self.log.debug('({}) {}'.format(x,data))
-            fout.write(data + os.linesep)
-            x += 1
+        if table is not None:
+            fout   = open(self.out_path + "finviz-" + _SYM_ + "-" + _FF_ + "-" + today + ".txt", "w")
+            keys   = table.findAll(class_="snapshot-td2-cp")
+            values = table.findAll(class_="snapshot-td2")
+            x = 0 
             data = get_fundametal_data(keys, values, x)
-        fout.close()
+            while data:
+                self.log.debug('({}) {}'.format(x,data))
+                fout.write(data + os.linesep)
+                x += 1
+                data = get_fundametal_data(keys, values, x)
+            fout.close()
+        else:
+            self.log.error("bsObj.find(\"\", {\"class\":\"snapshot-table2\"}) non ha trovato nulla!")
 
 
     def load_ratings(self, document, today):
 
         _SYM_, bsObj = document
         _RT_ = 'RATINGS' ##TODO
-        fout    = open(self.out_path + "finviz-" + _SYM_ + "-" + _RT_ + "-" + today + ".txt", "w")
         ratings = bsObj.findAll("", {"class":re.compile("fullview-ratings-*")})
-        for item in ratings:
-            fout.write(item.get_text())
-        fout.close()
+        if ratings is not None:
+            self.log.info("file <"+self.out_path + "finviz-" + _SYM_ + "-" + _RT_ + "-" + today + ".txt"+">")
+            fout    = open(self.out_path + "finviz-" + _SYM_ + "-" + _RT_ + "-" + today + ".txt", "w")
+            for item in ratings:
+                fout.write(item.get_text())
+            fout.close()
+        else:
+            self.log.error("no rating entry found!")
 
 
     def load_news(self, document, today):

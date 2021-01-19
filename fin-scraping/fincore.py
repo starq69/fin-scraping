@@ -23,6 +23,7 @@ class FinCoremodel(object):
     _RT_    = 'RATINGS'        # ratings
     _NEWS_  = 'NEWS'         # news
 
+    # TODO passare un TAG (per il nome modulo da importare e/o file config)? (dal main)
     def __init__(self):
 
         base_dir    = os.path.dirname(os.path.realpath(__file__))
@@ -50,6 +51,7 @@ class FinCoremodel(object):
             else:
                 logging.config.fileConfig(self.config_log)
                 self.log = logging.getLogger(__name__)
+                self.log.info("log file set")
 
                 ##TODO
                 '''rimuovere u_a dalla config. ed utilizzare ad es. random.choice(ua__list) con user_agent.generate_user_agent() 
@@ -57,10 +59,10 @@ class FinCoremodel(object):
                 https://www.scrapehero.com/how-to-rotate-proxies-and-ip-addresses-using-python-3/
                 '''
 
-                self.u_a      = self.config['GLOBALS']['user_agent'] 
+                #self.u_a      = self.config['GLOBALS']['user_agent'] 
                 self.sym_file = self.config['GLOBALS']['symbol_file']
-                self.out_path = self.config['GLOBALS']['output_path']
-                self.base_url = self.config['GLOBALS']['base_url']
+                #self.out_path = self.config['GLOBALS']['output_path']
+                #self.base_url = self.config['GLOBALS']['base_url']
                 self.scan_url_news = self.config['GLOBALS']['scan_url_news']
 
                 self.log.info('START: config file is <{}>'.format(self.config_file))
