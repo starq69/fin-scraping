@@ -4,9 +4,10 @@
 https://stackoverflow.com/questions/301134/dynamic-module-import-in-python
 https://stamat.wordpress.com/2013/06/30/dynamic-module-import-in-python/
 '''
-import sys, logging
-#import imp          ## deprecated from 3.4
-import importlib
+import sys
+from importlib import import_module
+import logging
+#import importlib
 
 
 def supply_instance(name, **kwargs):
@@ -15,7 +16,8 @@ def supply_instance(name, **kwargs):
     name    = name.strip()
     _class  = name[0].upper() + name[1:]
     try:
-        module = __import__(name)
+        #module = __import__(name)
+        module = import_module(name)
         _class = getattr(module, _class)
         return _class(**kwargs)
 

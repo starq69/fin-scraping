@@ -25,8 +25,7 @@ class FinCoremodel(object):
 
     def __init__(self, **kwargs):
 
-        self.web_scraper = kwargs['web_scraper'].strip()
-        self._scrapers   = dict() ### scraper instances
+        self._scrapers   = dict() 
 
         base_dir    = os.path.dirname(os.path.realpath(__file__))
         parent_dir  = os.path.split(base_dir)[0]
@@ -37,32 +36,43 @@ class FinCoremodel(object):
 
         try:
             if not self.config.read(self.config_file):
-
-                raise FinCoremodelException('missing <' + self.config_file + '> configuration file.')
+                print('EXCEPTION: ('++')missing or invalid configuration file :<' + self.config_file + '> : ABORT')
+                sys.exit(1)
+                #raise FinCoremodelException('missing or invalid configuration file :<' + self.config_file + '>')
 
             elif self.config['GLOBALS']['locked'] == 'Yes':
-
-                raise FinCoremodelException(__name__ + ' is locked. To run it unset GLOBALS.locked')
+                #raise FinCoremodelException(__name__ + ' is locked. To run it unset GLOBALS.locked')
+                print(__name__ + ' is locked. To run it unset GLOBALS.locked : ABORT')
+                sys.exit(1)
             else:
                 logging.config.fileConfig(self.config_log)
                 self.log = logging.getLogger(__name__)
+                self.log.info('program started')
 
-                ##TODO
-                #rimuovere u_a dalla config. ed utilizzare ad es. random.choice(ua__list) con user_agent.generate_user_agent() 
-                #vedere :
-                #https://www.scrapehero.com/how-to-rotate-proxies-and-ip-addresses-using-python-3/
+            self.web_scraper = kwargs['web_scraper'] ## can raise KeyError
 
-                self.sym_file = self.config['GLOBALS']['symbol_file']
-                self.scan_url_news = self.config['GLOBALS']['scan_url_news']
+            if type(self.web_scraper) is list:
+                self.log.info('<web_scraper> kwarg paramenter need to be a string, list is not yet implemented.')
+                sys.exit(1)
+            elif type(self.web_scraper) is str:
+                self.web_scraper = self.web_scraper.strip()
+            else:
+                self.log.error('FinCoremodel <web_scraper> paramenter cannot be of type {}'.format(type(self.web_scraper)))
+                sys.exit(1)
 
-                self.log.info('START: config file is <{}>'.format(self.config_file))
-                if self.scan_url_news:
-                    self.log.info('scan_url_news flag is FALSE') ##!!
+            self.sym_file = self.config['GLOBALS']['symbol_file']
+            self.scan_url_news = self.config['GLOBALS']['scan_url_news'] # flag
+
+            self.log.info('START: config file is <{}>'.format(self.config_file))
+            if self.scan_url_news:
+                self.log.info('scan_url_news flag is FALSE') ##!!
 
         except configparser.Error as e:
             self.log.error ('configparser.Error : {} --> ABORT'.format (e))
             sys.exit(1)
-
+        except KeyError as e:
+            self.log.error('During inizialization of class FinCoremodel: missing <web_scraper> kwarg: ABORT')
+            sys.exit(1)
         except Exception as e:
             
             #if self.__exit__(*sys.exc_info()):
@@ -81,9 +91,9 @@ class FinCoremodel(object):
             self.log.info('web-scraper <{}> instance succesfully created'.format(self.web_scraper))
 
         except Exception as e:
-            #self.log.error('FAIL to create web-scraper <{}> instance: ABORT'.format(self.web_scraper))
-            raise FinCoremodelException('FAIL to create web-scraper <{}> instance: ABORT'.format(self.web_scraper), e)
-            #sys.exit(1)
+            #raise FinCoremodelException('FAIL to create web-scraper <{}> instance: ABORT'.format(self.web_scraper), e)
+            self.log.error('FAIL to create web-scraper <{}> instance: ABORT'.format(self.web_scraper))
+            sys.exit(1)
 
         return self
 
@@ -105,6 +115,6 @@ class FinCoremodel(object):
     def get_web_scraper(self, name):
 
         if name not in self._scrapers:
-            raise FinCoremodelException('Invalid module name <{}>for web scraper!'.format(name))
+            raise FinCoremodelException('The module <{}> is missing from the dynamic modules imported with FinCoremodel'.format(name))
 
         return self._scrapers[name]

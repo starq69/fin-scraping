@@ -3,14 +3,17 @@
 
 import os, re
 import logging
-#import logging.config
 from bs4 import BeautifulSoup 
 import urllib.request
 from html import unescape as unescape     # iPython 3.4+ ==> html.unescape(s)
 from urllib.error import URLError, HTTPError
 from webscraper import WebScraper
 
-
+'''
+    modulo plug-in 
+    filename : <name>.py
+    classe   : <Name>(WebScraper)
+'''
 class Finviz(WebScraper):
 
     def __init__(self, **kwargs):
@@ -29,6 +32,8 @@ class Finviz(WebScraper):
 
             url = self.base_url + _SYM_ 
 
+            # TODO rimuovere u_a dalla config. ed utilizzare ad es. random.choice(ua_list) con user_agent.generate_user_agent() 
+            # vedere: https://www.scrapehero.com/how-to-rotate-proxies-and-ip-addresses-using-python-3/
             req = urllib.request.Request (url)
             req.add_header ('User-Agent', self.u_a)
 
